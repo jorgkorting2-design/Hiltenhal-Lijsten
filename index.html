@@ -513,7 +513,57 @@
 
 <div class="toast" id="toast"><span id="toastMsg"></span></div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDd0jWFlof7cYzm_rBD2tjWB3s23GrOow0",
+  authDomain: "hiltenhal-800dd.firebaseapp.com",
+  projectId: "hiltenhal-800dd",
+  storageBucket: "hiltenhal-800dd.firebasestorage.app",
+  messagingSenderId: "762218737802",
+  appId: "1:762218737802:web:63fb77c4473e3db0a0bd73",
+  measurementId: "G-Y3J8EYPB6R"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+
+// ===== FIREBASE HELPERS =====
+async function fbSet(key, value) {
+  try {
+    await setDoc(doc(db, "hiltenhal", key), { data: JSON.stringify(value) });
+  } catch(e) { console.error("fbSet error", e); }
+}
+
+async function fbGet(key) {
+  try {
+    const snap = await getDoc(doc(db, "hiltenhal", key));
+    if (snap.exists()) return JSON.parse(snap.data().data);
+  } catch(e) { console.error("fbGet error", e); }
+  return null;
+}
+
+async function fbAddHistory(entry) {
+  try {
+    await addDoc(collection(db, "hiltenhal_history"), { ...entry, ts: Date.now() });
+  } catch(e) { console.error("fbAddHistory error", e); }
+}
+
+async function fbGetHistory() {
+  try {
+    const q = query(collection(db, "hiltenhal_history"), orderBy("ts", "desc"), limit(200));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => d.data());
+  } catch(e) { console.error("fbGetHistory error", e); return []; }
+}
+
+// ===== OVERRIDE STORAGE FUNCTIONS =====
+window._fbReady = false;
+window._saveState = async function(key, value) { await fbSet(key, value); };
+window._getHistory = fbGetHistory;
+window._addHistory = fbAddHistory;
 // ===== DATA =====
 
 const dagelijksTakenData = [
@@ -792,25 +842,6 @@ let collapsedSections = {};
 
 const DAYS = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
 
-function init() {
-  document.getElementById('headerDate').textContent =
-    new Date().toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' });
-  const saved = localStorage.getItem('dagelijks_' + getTodayKey());
-  if (saved) dagelijksState = JSON.parse(saved);
-  const savedSport = localStorage.getItem('sportveld_' + getTodayKey());
-  if (savedSport) sportveldState = JSON.parse(savedSport);
-  const savedOnderhoud = localStorage.getItem('onderhoud_state');
-  if (savedOnderhoud) onderhoudState = JSON.parse(savedOnderhoud);
-  const savedRemco = localStorage.getItem('remco_' + getThisWeekKey());
-  if (savedRemco) remcoState = JSON.parse(savedRemco);
-  renderAlerts();
-  renderDagelijks();
-  renderRemco();
-  renderSportvelden();
-  renderOnderhoud();
-  renderHistorie();
-}
-
 // ===== ALERTS =====
 function getDaysSince(isoDate) {
   if (!isoDate) return null;
@@ -878,6 +909,31 @@ function getThisWeekKey() {
   return monday.toISOString().split('T')[0];
 }
 
+async function init() {
+  document.getElementById('headerDate').textContent =
+    new Date().toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' });
+
+  // Load all state from Firebase
+  const [savedDag, savedSport, savedOnderhoud, savedRemco] = await Promise.all([
+    fbGet('dagelijks_' + getTodayKey()),
+    fbGet('sportveld_' + getTodayKey()),
+    fbGet('onderhoud_state'),
+    fbGet('remco_' + getThisWeekKey())
+  ]);
+
+  if (savedDag) dagelijksState = savedDag;
+  if (savedSport) sportveldState = savedSport;
+  if (savedOnderhoud) onderhoudState = savedOnderhoud;
+  if (savedRemco) remcoState = savedRemco;
+
+  renderAlerts();
+  renderDagelijks();
+  renderRemco();
+  renderSportvelden();
+  renderOnderhoud();
+  renderHistorie();
+}
+
 // ===== RENDER DAGELIJKS =====
 
 function renderDagelijks() {
@@ -926,7 +982,7 @@ function renderDagelijks() {
       item.innerHTML = `<div class="task-check">${isDone ? '✓' : ''}</div><div class="task-label">${t.taak}</div>`;
       item.onclick = () => {
         dagelijksState[t.key] = !dagelijksState[t.key];
-        localStorage.setItem('dagelijks_' + getTodayKey(), JSON.stringify(dagelijksState));
+        fbSet('dagelijks_' + getTodayKey(), dagelijksState);
         renderDagelijks();
       };
       list.appendChild(item);
@@ -965,7 +1021,7 @@ function renderDagelijks() {
       item.innerHTML = `<div class="task-check">${isDone ? '✓' : ''}</div><div class="task-label">${taak}</div>`;
       item.onclick = () => {
         dagelijksState[key] = !dagelijksState[key];
-        localStorage.setItem('dagelijks_' + getTodayKey(), JSON.stringify(dagelijksState));
+        fbSet('dagelijks_' + getTodayKey(), dagelijksState);
         renderDagelijks();
       };
       list.appendChild(item);
@@ -1015,7 +1071,7 @@ function renderSportvelden() {
       item.innerHTML = `<div class="task-check">${isDone ? '✓' : ''}</div><div class="task-label">${taak}</div>`;
       item.onclick = () => {
         sportveldState[key] = !sportveldState[key];
-        localStorage.setItem('sportveld_' + getTodayKey(), JSON.stringify(sportveldState));
+        fbSet('sportveld_' + getTodayKey(), sportveldState);
         renderSportvelden();
       };
       list.appendChild(item);
@@ -1068,7 +1124,7 @@ function toggleRemcoTask(key) {
   if (!remcoState[key]) remcoState[key] = { selected: false, dagen: [] };
   remcoState[key].selected = !remcoState[key].selected;
   if (!remcoState[key].selected) remcoState[key].dagen = [];
-  localStorage.setItem('remco_' + getThisWeekKey(), JSON.stringify(remcoState));
+  fbSet('remco_' + getThisWeekKey(), remcoState);
   renderRemco();
 }
 
@@ -1077,7 +1133,7 @@ function toggleDay(key, dag) {
   const idx = remcoState[key].dagen.indexOf(dag);
   if (idx >= 0) remcoState[key].dagen.splice(idx, 1);
   else remcoState[key].dagen.push(dag);
-  localStorage.setItem('remco_' + getThisWeekKey(), JSON.stringify(remcoState));
+  fbSet('remco_' + getThisWeekKey(), remcoState);
   updateGeneratedList();
   const dc = document.getElementById('days_' + key);
   if (dc) dc.innerHTML = DAYS.map(d =>
@@ -1174,7 +1230,7 @@ function renderOnderhoud() {
           saveToHistory({ type: 'onderhoud', datum: new Date().toISOString(), door: 'Remco', taak: taak.naam, freq: taak.freq });
           showToast(taak.naam + ' afgevinkt ✓');
         }
-        localStorage.setItem('onderhoud_state', JSON.stringify(onderhoudState));
+        fbSet('onderhoud_state', onderhoudState);
         renderAlerts();
         renderOnderhoud();
       };
@@ -1239,10 +1295,7 @@ function submitSportvelden() {
 
 // ===== HISTORY =====
 function saveToHistory(entry) {
-  const history = JSON.parse(localStorage.getItem('hiltenhal_history') || '[]');
-  history.unshift(entry);
-  localStorage.setItem('hiltenhal_history', JSON.stringify(history.slice(0, 300)));
-  renderHistorie();
+  fbAddHistory(entry).then(() => renderHistorie());
 }
 
 function toggleHistoryDetail(id) {
@@ -1257,9 +1310,10 @@ function toggleHistoryDetail(id) {
   }
 }
 
-function renderHistorie() {
+async function renderHistorie() {
   const container = document.getElementById('historieList');
-  const history = JSON.parse(localStorage.getItem('hiltenhal_history') || '[]');
+  container.innerHTML = '<div class="empty-state"><div class="icon">⏳</div>Laden...</div>';
+  const history = await fbGetHistory();
   const filterNaam = (document.getElementById('filterNaam').value || '').toLowerCase();
   const filterVanaf = document.getElementById('filterVanaf').value;
   const filterType = document.getElementById('filterType').value;
