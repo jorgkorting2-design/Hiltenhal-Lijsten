@@ -1120,7 +1120,7 @@ function renderRemco() {
   updateGeneratedList();
 }
 
-function toggleRemcoTask(key) {
+window.toggleRemcoTask = function toggleRemcoTask(key) {
   if (!remcoState[key]) remcoState[key] = { selected: false, dagen: [] };
   remcoState[key].selected = !remcoState[key].selected;
   if (!remcoState[key].selected) remcoState[key].dagen = [];
@@ -1128,7 +1128,7 @@ function toggleRemcoTask(key) {
   renderRemco();
 }
 
-function toggleDay(key, dag) {
+window.toggleDay = function toggleDay(key, dag) {
   if (!remcoState[key]) return;
   const idx = remcoState[key].dagen.indexOf(dag);
   if (idx >= 0) remcoState[key].dagen.splice(idx, 1);
@@ -1174,7 +1174,7 @@ function updateGeneratedList() {
   container.innerHTML = html;
 }
 
-function saveWeekplan() {
+window.saveWeekplan = function saveWeekplan() {
   const byDay = {};
   DAYS.forEach(d => byDay[d] = []);
   remcoTakenData.forEach((sectie, si) => {
@@ -1241,7 +1241,7 @@ function renderOnderhoud() {
 }
 
 // ===== SUBMIT =====
-function submitDagelijks() {
+window.submitDagelijks = function submitDagelijks() {
   const naam = document.getElementById('invullerNaam').value.trim();
   if (!naam) { showToast('Vul eerst je naam in!'); return; }
   let total = 0, done = 0;
@@ -1274,7 +1274,7 @@ function submitDagelijks() {
   document.getElementById('opmerkingen').value = '';
 }
 
-function submitSportvelden() {
+window.submitSportvelden = function submitSportvelden() {
   const naam = document.getElementById('sportveldNaam').value.trim();
   if (!naam) { showToast('Vul eerst je naam in!'); return; }
   let total = 0, done = 0;
@@ -1298,7 +1298,7 @@ function saveToHistory(entry) {
   fbAddHistory(entry).then(() => renderHistorie());
 }
 
-function toggleHistoryDetail(id) {
+window.toggleHistoryDetail = function toggleHistoryDetail(id) {
   const el = document.getElementById('detail_' + id);
   const arrow = document.getElementById('arrow_' + id);
   if (el.style.display === 'none') {
@@ -1310,7 +1310,7 @@ function toggleHistoryDetail(id) {
   }
 }
 
-async function renderHistorie() {
+window.renderHistorie = async function renderHistorie() {
   const container = document.getElementById('historieList');
   container.innerHTML = '<div class="empty-state"><div class="icon">⏳</div>Laden...</div>';
   const history = await fbGetHistory();
@@ -1410,7 +1410,7 @@ async function renderHistorie() {
   }).join('');
 }
 
-function showTab(tab, el) {
+window.showTab = function showTab(tab, el) {
   document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
