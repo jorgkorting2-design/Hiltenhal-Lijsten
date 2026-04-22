@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hiltenhal – Schoonmaak & Onderhoud</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --goud: #C9A227;
+    --goud-licht: #F0D060;
+    --donker: #1A1A1A;
+    --grijs: #F5F5F3;
+    --grijs-mid: #E8E8E5;
+    --grijs-tekst: #6B6B6B;
+    --wit: #FFFFFF;
+    --groen: #2D7A4F;
+    --groen-licht: #E8F5EE;
+    --rood: #C0392B;
+    --blauw: #2563EB;
+    --blauw-licht: #EFF6FF;
+    --oranje: #D97706;
+    --oranje-licht: #FEF3C7;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--grijs);
+    color: var(--donker);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--donker);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo-badge {
+    background: var(--goud);
+    color: var(--donker);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 6px;
+  }
+  header h1 { color: var(--wit); font-size: 16px; font-weight: 600; }
+  .header-date { margin-left: auto; color: #999; font-size: 13px; font-family: 'DM Mono', monospace; }
+
+  .tabs {
+    background: var(--donker);
+    display: flex;
+    padding: 0 12px;
+    border-top: 1px solid #333;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 12px 12px;
+    color: #888;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab.active { color: var(--goud); border-bottom-color: var(--goud); }
+  .tab:hover:not(.active) { color: #ccc; }
+
+  .content { display: none; padding: 16px; max-width: 900px; margin: 0 auto; }
+  .content.active { display: block; }
+
+  .section-header {
+    background: var(--donker);
+    color: var(--wit);
+    padding: 10px 14px;
+    border-radius: 8px 8px 0 0;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .section-header:first-child { margin-top: 0; }
+  .section-header .section-icon { font-size: 15px; }
+  .section-progress {
+    margin-left: auto;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    background: rgba(255,255,255,0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+    color: var(--goud-licht);
+  }
+  .section-toggle { font-size: 10px; margin-left: 4px; transition: transform 0.2s; }
+  .section-header.collapsed .section-toggle { transform: rotate(-90deg); }
+
+  .task-list {
+    background: var(--wit);
+    border-radius: 0 0 8px 8px;
+    border: 1px solid var(--grijs-mid);
+    border-top: none;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .task-list.collapsed { display: none; }
+
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--grijs-mid);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .task-item:last-child { border-bottom: none; }
+  .task-item:hover { background: var(--grijs); }
+  .task-item.done { background: var(--groen-licht); }
+
+  .task-check {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--grijs-mid);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    font-size: 13px;
+  }
+  .task-item.done .task-check { background: var(--groen); border-color: var(--groen); color: white; }
+
+  .task-label { font-size: 14px; flex: 1; line-height: 1.4; }
+  .task-item.done .task-label { text-decoration: line-through; color: var(--grijs-tekst); }
+
+  .progress-bar-wrap {
+    background: var(--grijs-mid);
+    border-radius: 20px;
+    height: 6px;
+    margin: 12px 0 16px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--groen), #4CAF82);
+    border-radius: 20px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .progress-label span { font-size: 13px; color: var(--grijs-tekst); }
+  .progress-label strong { font-size: 14px; }
+
+  .submit-box {
+    background: var(--wit);
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 20px;
+    border: 1px solid var(--grijs-mid);
+  }
+  .submit-box h3 { font-size: 14px; margin-bottom: 12px; }
+  .form-row { margin-bottom: 12px; }
+  .form-row label { display: block; font-size: 12px; font-weight: 600; color: var(--grijs-tekst); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-row input, .form-row textarea, .form-row select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--grijs-mid);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: var(--grijs);
+    transition: border-color 0.2s;
+  }
+  .form-row input:focus, .form-row textarea:focus, .form-row select:focus {
+    outline: none;
+    border-color: var(--goud);
+    background: var(--wit);
+  }
+
+  .btn-primary {
+    background: var(--goud);
+    color: var(--donker);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: var(--goud-licht); }
+  .btn-primary:disabled { background: var(--grijs-mid); color: var(--grijs-tekst); cursor: not-allowed; }
+
+  .remco-intro {
+    background: var(--blauw-licht);
+    border: 1px solid #BFDBFE;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: #1E40AF;
+  }
+  .remco-intro strong { display: block; margin-bottom: 4px; font-size: 14px; }
+
+  .week-task-item {
+    background: var(--wit);
+    border: 1px solid var(--grijs-mid);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .week-task-item.selected { border-color: var(--blauw); background: var(--blauw-licht); }
+  .week-task-check {
+    width: 22px; height: 22px;
+    border: 2px solid var(--grijs-mid);
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    transition: all 0.15s;
+    margin-top: 1px;
+  }
+  .week-task-item.selected .week-task-check { background: var(--blauw); border-color: var(--blauw); color: white; }
+  .week-task-info { flex: 1; }
+  .week-task-name { font-size: 14px; font-weight: 500; }
+  .week-task-meta { font-size: 12px; color: var(--grijs-tekst); margin-top: 2px; }
+
+  .day-selector { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .day-btn {
+    padding: 4px 10px;
+    border: 1px solid var(--grijs-mid);
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    background: var(--grijs);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .day-btn.active { background: var(--donker); color: var(--wit); border-color: var(--donker); }
+
+  .generated-list { background: var(--wit); border: 1px solid var(--grijs-mid); border-radius: 10px; padding: 16px; margin-top: 16px; }
+  .generated-list h3 { font-size: 14px; margin-bottom: 12px; }
+  .gen-day-section { margin-bottom: 12px; }
+  .gen-day-header { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--grijs-tekst); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--grijs-mid); }
+  .gen-task { font-size: 13px; padding: 4px 0; }
+
+  .onderhoud-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .badge-maandelijks { background: var(--oranje-licht); color: var(--oranje); }
+  .badge-halfjaarlijks { background: #FEE2E2; color: var(--rood); }
+  .badge-jaarlijks { background: #F3E8FF; color: #7C3AED; }
+
+  /* Sportvelden */
+  .sportvelden-intro {
+    background: var(--groen-licht);
+    border: 1px solid #A7F3D0;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: #065F46;
+  }
+  .sportvelden-intro strong { display: block; margin-bottom: 4px; font-size: 14px; }
+
+  .history-filter {
+    background: var(--wit);
+    border: 1px solid var(--grijs-mid);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+  .history-filter .form-row { margin: 0; flex: 1; min-width: 140px; }
+
+  .history-entry {
+    background: var(--wit);
+    border: 1px solid var(--grijs-mid);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 8px;
+  }
+  .history-entry-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .history-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--donker);
+    color: var(--goud);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .history-name { font-size: 14px; font-weight: 600; }
+  .history-score { margin-left: auto; font-size: 13px; color: var(--grijs-tekst); }
+  .history-score.perfect { color: var(--groen); font-weight: 600; }
+  .history-tasks { font-size: 13px; color: var(--grijs-tekst); }
+  .history-tasks span { color: var(--donker); font-weight: 500; }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--grijs-tekst); font-size: 14px; }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--donker);
+    color: var(--wit);
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 999;
+    transition: transform 0.3s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .section-count-badge {
+    background: rgba(201,162,39,0.2);
+    color: var(--goud-licht);
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ONDERHOUD ALERTS */
+  .alert-banner {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+  .alert-banner-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: #991B1B;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .alert-item {
+    font-size: 13px;
+    color: #7F1D1D;
+    padding: 3px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .alert-item .alert-days {
+    margin-left: auto;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    background: #FEE2E2;
+    padding: 1px 6px;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+  .alert-warning {
+    background: #FFFBEB;
+    border-color: #FDE68A;
+  }
+  .alert-warning .alert-banner-header { color: #92400E; }
+  .alert-warning .alert-item { color: #78350F; }
+  .alert-warning .alert-item .alert-days { background: #FEF3C7; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-badge">HH</div>
+  <h1>Hiltenhal – Schoonmaak</h1>
+  <span class="header-date" id="headerDate"></span>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dagelijks', this)">📋 Dagelijks</div>
+  <div class="tab" onclick="showTab('remco', this)">📅 Remco</div>
+  <div class="tab" onclick="showTab('sportvelden', this)">🏟️ Sportvelden</div>
+  <div class="tab" onclick="showTab('onderhoud', this)">🔧 Onderhoud</div>
+  <div class="tab" onclick="showTab('historie', this)">🕐 Historie</div>
+</div>
+
+<!-- TAB 1: DAGELIJKS -->
+<div class="content active" id="tab-dagelijks">
+  <div id="onderhoudAlerts"></div>
+  <div class="progress-label">
+    <span>Voortgang vandaag</span>
+    <strong id="progressText">0 / 0 taken</strong>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+  </div>
+  <div id="dagelijksTasks"></div>
+  <div class="submit-box">
+    <h3>✍️ Lijst afronden</h3>
+    <div class="form-row">
+      <label>Ingevuld door</label>
+      <input type="text" id="invullerNaam" placeholder="Jouw naam...">
+    </div>
+    <div class="form-row">
+      <label>Opmerkingen (optioneel)</label>
+      <textarea id="opmerkingen" rows="2" placeholder="Bijv. toilet buiten werking, extra gedweild..."></textarea>
+    </div>
+    <button class="btn-primary" id="submitBtn" onclick="submitDagelijks()" disabled>Lijst opslaan ✓</button>
+  </div>
+</div>
+
+<!-- TAB 2: REMCO -->
+<div class="content" id="tab-remco">
+  <div class="remco-intro">
+    <strong>📅 Weekplanning – Remco</strong>
+    Vink aan welke taken deze week gedaan moeten worden en kies op welke dag. Het personeel ziet deze taken op de juiste dag.
+  </div>
+  <div id="remcoTasks"></div>
+  <div class="submit-box">
+    <h3>📋 Gegenereerde weeklijst</h3>
+    <div id="generatedWeekList"><p style="color:var(--grijs-tekst);font-size:13px;">Selecteer taken hierboven om ze in te plannen.</p></div>
+    <button class="btn-primary" style="margin-top:12px;" onclick="saveWeekplan()">Weekplan opslaan ✓</button>
+  </div>
+</div>
+
+<!-- TAB 3: SPORTVELDEN -->
+<div class="content" id="tab-sportvelden">
+  <div class="sportvelden-intro">
+    <strong>🏟️ Sportvelden – dagelijks onderhoud</strong>
+    Frequenties worden nog bepaald in overleg met Remco. Vink af wat gedaan is.
+  </div>
+  <div id="sportveldTasks"></div>
+  <div class="submit-box">
+    <h3>✍️ Lijst afronden</h3>
+    <div class="form-row">
+      <label>Ingevuld door</label>
+      <input type="text" id="sportveldNaam" placeholder="Jouw naam...">
+    </div>
+    <div class="form-row">
+      <label>Opmerkingen (optioneel)</label>
+      <textarea id="sportveldOpmerkingen" rows="2" placeholder="Bijv. gravel bijgestrooid, net aangepast..."></textarea>
+    </div>
+    <button class="btn-primary" id="sportveldSubmitBtn" onclick="submitSportvelden()" disabled>Lijst opslaan ✓</button>
+  </div>
+</div>
+
+<!-- TAB 4: ONDERHOUD -->
+<div class="content" id="tab-onderhoud">
+  <div class="remco-intro" style="background:var(--oranje-licht);border-color:#FDE68A;color:#92400E;">
+    <strong>🔧 Periodiek onderhoud & inspecties</strong>
+    Technische controles. Vink af als je een controle hebt uitgevoerd — dit wordt opgeslagen in de historie.
+  </div>
+  <div id="onderhoudTasks"></div>
+</div>
+
+<!-- TAB 5: HISTORIE -->
+<div class="content" id="tab-historie">
+  <div class="history-filter">
+    <div class="form-row">
+      <label>Zoek op naam</label>
+      <input type="text" id="filterNaam" placeholder="Naam..." oninput="renderHistorie()">
+    </div>
+    <div class="form-row">
+      <label>Datum vanaf</label>
+      <input type="date" id="filterVanaf" oninput="renderHistorie()">
+    </div>
+    <div class="form-row">
+      <label>Type</label>
+      <select id="filterType" onchange="renderHistorie()">
+        <option value="">Alles</option>
+        <option value="dagelijks">Dagelijks</option>
+        <option value="sportvelden">Sportvelden</option>
+        <option value="weekplan">Weekplan Remco</option>
+        <option value="onderhoud">Onderhoud</option>
+      </select>
+    </div>
+  </div>
+  <div id="historieList"></div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+// ===== DATA =====
+
+const dagelijksTakenData = [
+  { sectie: "Entree", icon: "🚪", taken: [
+    "Entreevloer stofzuigen",
+    "Deuren en klinken schoonmaken",
+    "Vloermatten uitschudden",
+    "Desinfectiepomp controleren en bijvullen indien nodig"
+  ]},
+  { sectie: "Damestoilet (voorzijde)", icon: "🚻", taken: [
+    "WC schoonmaken",
+    "Wasbak schoonmaken",
+    "Vloer schoonmaken",
+    "Prullenbak legen",
+    "Deuren en klinken schoonmaken"
+  ]},
+  { sectie: "Herentoilet (voorzijde)", icon: "🚻", taken: [
+    "WC schoonmaken",
+    "Wasbak schoonmaken",
+    "Vloer schoonmaken",
+    "Prullenbak legen",
+    "Deuren en klinken schoonmaken"
+  ]},
+  { sectie: "Gang (linkerzijde entree)", icon: "🏢", taken: [
+    "Vloer stofzuigen",
+    "Deuren en klinken schoonmaken"
+  ]},
+  { sectie: "Kantine", icon: "🍽️", taken: [
+    "Tafels schoonmaken",
+    "Stoelen controleren op vlekken/vuil",
+    "Vloer stofzuigen",
+    "Prullenbakken legen"
+  ]},
+  { sectie: "Biljartruimte", icon: "🎱", taken: [
+    "Vloer stofzuigen",
+    "Prullenbakken legen"
+  ]},
+  { sectie: "Toiletten achter (dames)", icon: "🚽", taken: [
+    "WC schoonmaken",
+    "Wasbak schoonmaken",
+    "Vloer schoonmaken",
+    "Prullenbak legen",
+    "Deuren en klinken schoonmaken"
+  ]},
+  { sectie: "Toiletten achter (heren)", icon: "🚽", taken: [
+    "WC schoonmaken",
+    "Urinoirs schoonmaken",
+    "Wasbak schoonmaken",
+    "Vloer schoonmaken",
+    "Prullenbak legen",
+    "Deuren en klinken schoonmaken"
+  ]},
+  { sectie: "Terras", icon: "☀️", taken: [
+    "Tafels schoonmaken",
+    "Stoelen controleren op vlekken/vuil",
+    "Prullenbakken legen"
+  ]},
+  { sectie: "Indoor padelbanen", icon: "🏸", taken: [
+    "Tafels schoonmaken",
+    "Stoelen controleren op vlekken/vuil",
+    "Loungebanken controleren op vlekken/vuil",
+    "Bankjes controleren op vlekken/vuil"
+  ]},
+  { sectie: "Squashzone", icon: "🟡", taken: [
+    "Tafels schoonmaken",
+    "Stoelen controleren op vlekken/vuil",
+    "Bankjes controleren op vlekken/vuil"
+  ]},
+  { sectie: "Indoor tennisbanen", icon: "🎾", taken: [
+    "Stoelen controleren op vlekken/vuil"
+  ]},
+  { sectie: "Bar", icon: "🍺", taken: [
+    "Tapinstallatie (3 taps) spoelen",
+    "Tapinstallatie (4 taps) spoelen",
+    "Drip trays legen en schoonmaken",
+    "Barblad schoonmaken",
+    "Spoelbak schoonmaken",
+    "Koelkasten schoonmaken (buitenkant)",
+    "Koelkasten controleren en aanvullen",
+    "Fusten controleren en vervangen indien leeg",
+    "Kassasysteem schoonmaken",
+    "IJsemmer schoonmaken",
+    "Prullenbak legen",
+    "Koffiemachine schoonmaken",
+    "Kopjes en schoteltjes schoonmaken",
+    "Suikerpot/melkkannetje schoonmaken",
+    "Barmat schoonmaken",
+    "Vloer achter de bar dweilen",
+    "Viltjes vervangen"
+  ]},
+  { sectie: "Keuken", icon: "👨‍🍳", taken: [
+    "Magnetron schoonmaken",
+    "Salamander schoonmaken",
+    "Koelkast schoonmaken (buitenkant)",
+    "Vriezer schoonmaken (buitenkant)",
+    "Vaatwasser naspoelen",
+    "Spoelbak schoonmaken",
+    "Afdruiprek schoonmaken",
+    "Werkblad schoonmaken",
+    "Handdoekdispenser bijvullen",
+    "Vloer dweilen",
+    "Prullenbak legen"
+  ]}
+];
+
+const remcoTakenData = [
+  { sectie: "Toiletten – extra taken", taken: [
+    { naam: "Spiegels toiletten schoonmaken", freq: "Wekelijks" },
+    { naam: "Zeepdispensers bijvullen/schoonmaken (alle toiletten)", freq: "Wekelijks" },
+    { naam: "Handdoekdispensers bijvullen/schoonmaken", freq: "Wekelijks" },
+    { naam: "Toiletborstel + houder schoonmaken", freq: "Wekelijks" },
+    { naam: "Wandtegels toiletten schoonmaken", freq: "Wekelijks" },
+    { naam: "Ventilatierooster toiletten schoonmaken", freq: "Wekelijks" },
+    { naam: "Verlichting toiletten schoonmaken", freq: "Wekelijks" }
+  ]},
+  { sectie: "Dameskleedruimte + douches", taken: [
+    { naam: "Douches schoonmaken en desinfecteren", freq: "Wekelijks" },
+    { naam: "Douchevloer schoonmaken", freq: "Wekelijks" },
+    { naam: "Wandtegels douches schoonmaken", freq: "Wekelijks" },
+    { naam: "Afvoeren schoonmaken", freq: "Wekelijks" },
+    { naam: "Zeepdispenser douches bijvullen", freq: "Wekelijks" },
+    { naam: "Bankjes schoonmaken", freq: "Wekelijks" },
+    { naam: "Kapstokken/haken schoonmaken", freq: "Wekelijks" },
+    { naam: "Kleedruimtevloer schoonmaken", freq: "Wekelijks" },
+    { naam: "Kleedruimte wanden schoonmaken", freq: "Wekelijks" },
+    { naam: "Spiegels kleedruimte schoonmaken", freq: "Wekelijks" },
+    { naam: "WC kleedruimte schoonmaken", freq: "Wekelijks" }
+  ]},
+  { sectie: "Herenkleedruimte + douches", taken: [
+    { naam: "Douches schoonmaken en desinfecteren", freq: "Wekelijks" },
+    { naam: "Douchevloer schoonmaken", freq: "Wekelijks" },
+    { naam: "Wandtegels douches schoonmaken", freq: "Wekelijks" },
+    { naam: "Afvoeren schoonmaken", freq: "Wekelijks" },
+    { naam: "Zeepdispenser douches bijvullen", freq: "Wekelijks" },
+    { naam: "Bankjes schoonmaken", freq: "Wekelijks" },
+    { naam: "Kapstokken/haken schoonmaken", freq: "Wekelijks" },
+    { naam: "Kleedruimtevloer schoonmaken", freq: "Wekelijks" },
+    { naam: "Kleedruimte wanden schoonmaken", freq: "Wekelijks" },
+    { naam: "Spiegels kleedruimte schoonmaken", freq: "Wekelijks" }
+  ]},
+  { sectie: "Entree & buiten", taken: [
+    { naam: "Parkeerplaats vegen/blazen", freq: "Wekelijks" },
+    { naam: "Trap naar ingang schoonmaken", freq: "Wekelijks" },
+    { naam: "Deurbel controleren", freq: "Wekelijks" },
+    { naam: "Verlichting buiten schoonmaken", freq: "Wekelijks" }
+  ]},
+  { sectie: "Kantine & biljart", taken: [
+    { naam: "Plinten kantine schoonmaken", freq: "Wekelijks" },
+    { naam: "Racketwinkel/display afstoffen", freq: "Wekelijks" },
+    { naam: "TV schoonmaken", freq: "Wekelijks" },
+    { naam: "Kantine vloer grondig schoonmaken", freq: "Wekelijks" },
+    { naam: "Ventilatierooster kantine schoonmaken", freq: "Wekelijks" },
+    { naam: "Biljarttafels laken borstelen", freq: "Wekelijks" },
+    { naam: "Pooltafel laken borstelen", freq: "Wekelijks" },
+    { naam: "Biljartruimte tafels schoonmaken", freq: "Wekelijks" },
+    { naam: "Biljartruimte stoelen controleren op vlekken/vuil", freq: "Wekelijks" }
+  ]},
+  { sectie: "Bar & keuken – extra taken", taken: [
+    { naam: "Tapleidingen grondig doorspoelen", freq: "Wekelijks" },
+    { naam: "Koelkasten grondig schoonmaken (van binnen)", freq: "Wekelijks" },
+    { naam: "Frituur grondig schoonmaken + olie verversen", freq: "Wekelijks" },
+    { naam: "Oven grondig schoonmaken", freq: "Wekelijks" },
+    { naam: "Afzuigkap vetfilters schoonmaken", freq: "Wekelijks" },
+    { naam: "RVS wandrekken schoonmaken", freq: "Wekelijks" },
+    { naam: "Vaatwasser grondig schoonmaken", freq: "Wekelijks" },
+    { naam: "Barstellingen/opbergkasten opruimen", freq: "Wekelijks" },
+    { naam: "Glaswerk rekken schoonmaken", freq: "Wekelijks" },
+    { naam: "Koffiemachine grondig schoonmaken", freq: "Wekelijks" }
+  ]},
+  { sectie: "Terras & buiten", taken: [
+    { naam: "BBQ grondig schoonmaken", freq: "Na evenement / wekelijks" },
+    { naam: "Terras vloer vegen", freq: "Wekelijks" },
+    { naam: "Schoonmaakkast opruimen", freq: "Wekelijks" }
+  ]},
+  { sectie: "Indoor padelbanen – extra taken", taken: [
+    { naam: "Pingpongtafel schoonmaken", freq: "Wekelijks" },
+    { naam: "Voetbaltafel schoonmaken", freq: "Wekelijks" }
+  ]}
+];
+
+const sportveldTakenData = [
+  { sectie: "Indoor tennisbanen (3x)", icon: "🎾", taken: [
+    "Banen vegen",
+    "Prullenbakken legen"
+  ]},
+  { sectie: "Indoor padelbanen (2x)", icon: "🏸", taken: [
+    "Banen vegen",
+    "Vloer rondom vegen",
+    "Prullenbakken legen"
+  ]},
+  { sectie: "Squashbanen (3x)", icon: "🟡", taken: [
+    "Baanvloer vegen/dweilen",
+    "Wanden schoonmaken",
+    "Deuren schoonmaken"
+  ]},
+  { sectie: "Outdoor tennis gravel (2x)", icon: "🌿", taken: [
+    "Banen vegen/slepen",
+    "Sproei-installatie controleren",
+    "Prullenbakken legen",
+    "Lijnveger schoonmaken na gebruik"
+  ]},
+  { sectie: "Outdoor padelbanen (2x)", icon: "🏸", taken: [
+    "Banen vegen",
+    "Prullenbakken legen"
+  ]},
+  { sectie: "Beachvolleyveld", icon: "🏐", taken: [
+    "Prullenbakken legen"
+  ]}
+];
+
+const onderhoudData = [
+  { sectie: "Brandveiligheid", icon: "🔥", taken: [
+    { naam: "Brandblussers controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Brandslanghaspels controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Nooduitgang gang (achterste WC's) controleren + deur vrijhouden", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Nooduitgang indoor padelbanen (→ terras outdoor padel) controleren + deur vrijhouden", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Nooduitgang squashbanen (→ buitenterras) controleren + deur vrijhouden", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Nooduitgang hoofdentree controleren + deur vrijhouden", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Nooduitgang deur terras controleren + deur vrijhouden", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Noodverlichting controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Vluchtwegaanduiding controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Rookmelders controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Brandblussers keuring (extern)", freq: "Jaarlijks", badge: "badge-jaarlijks", dagen: 365 },
+    { naam: "Brandmeldcentrale keuring (extern)", freq: "Jaarlijks", badge: "badge-jaarlijks", dagen: 365 }
+  ]},
+  { sectie: "Installaties", icon: "⚡", taken: [
+    { naam: "CV-installatie keuring/onderhoud (extern)", freq: "Jaarlijks", badge: "badge-jaarlijks", dagen: 365 },
+    { naam: "Ventilatiesystemen filters schoonmaken", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "Airco-installaties filters schoonmaken", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "Warmwatervoorziening onderhoud (extern)", freq: "Jaarlijks", badge: "badge-jaarlijks", dagen: 365 },
+    { naam: "Meterkast/verdeelkasten controleren", freq: "Jaarlijks", badge: "badge-jaarlijks", dagen: 365 }
+  ]},
+  { sectie: "Water & Afvoer", icon: "💧", taken: [
+    { naam: "Putten/drainage controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Afvoersystemen schoonmaken", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "Vetafscheider schoonmaken", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "Hoofdwateraansluiting controleren", freq: "Jaarlijks", badge: "badge-jaarlijks", dagen: 365 }
+  ]},
+  { sectie: "Veiligheid & EHBO", icon: "🏥", taken: [
+    { naam: "EHBO-koffers controleren/bijvullen", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "AED controleren", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "Beveiligingscamera's controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Alarmsysteem controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 }
+  ]},
+  { sectie: "Technisch & ICT", icon: "💻", taken: [
+    { naam: "Wifi-router/access points controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Geluidsinstallatie controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 }
+  ]},
+  { sectie: "Sanitair & Douches", icon: "🔩", taken: [
+    { naam: "Kitnaden damesdouches controleren", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "Kitnaden herendouches controleren", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "Wasbakken ontkalken (alle toiletten)", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Douchekoppen ontkalken", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 }
+  ]},
+  { sectie: "Banen & Constructies", icon: "🏟️", taken: [
+    { naam: "Squashbaan belijning controleren", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "Tennisbaan dakconstructie controleren", freq: "Jaarlijks", badge: "badge-jaarlijks", dagen: 365 },
+    { naam: "Baan 3 nooduitgang controleren", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "Gravel toplaag beoordelen/bijvullen", freq: "Jaarlijks", badge: "badge-jaarlijks", dagen: 365 },
+    { naam: "Padelconstructie bouten controleren", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 }
+  ]},
+  { sectie: "Bar & Keuken technisch", icon: "🍳", taken: [
+    { naam: "Brandblusser keuken controleren", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "Koffiemachine ontkalken", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Kluis controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
+    { naam: "Vriezer ontdooien/grondig schoonmaken", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 }
+  ]}
+];
+
+// ===== STATE =====
+let dagelijksState = {};
+let sportveldState = {};
+let remcoState = {};
+let onderhoudState = {}; // { key: { done: bool, datum: ISO string } }
+let collapsedSections = {};
+
+const DAYS = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
+
+function init() {
+  document.getElementById('headerDate').textContent =
+    new Date().toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' });
+  const saved = localStorage.getItem('dagelijks_' + getTodayKey());
+  if (saved) dagelijksState = JSON.parse(saved);
+  const savedSport = localStorage.getItem('sportveld_' + getTodayKey());
+  if (savedSport) sportveldState = JSON.parse(savedSport);
+  const savedOnderhoud = localStorage.getItem('onderhoud_state');
+  if (savedOnderhoud) onderhoudState = JSON.parse(savedOnderhoud);
+  const savedRemco = localStorage.getItem('remco_' + getThisWeekKey());
+  if (savedRemco) remcoState = JSON.parse(savedRemco);
+  renderAlerts();
+  renderDagelijks();
+  renderRemco();
+  renderSportvelden();
+  renderOnderhoud();
+  renderHistorie();
+}
+
+// ===== ALERTS =====
+function getDaysSince(isoDate) {
+  if (!isoDate) return null;
+  const diff = Date.now() - new Date(isoDate).getTime();
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
+function renderAlerts() {
+  const container = document.getElementById('onderhoudAlerts');
+  const verlopen = [];
+  const bijna = [];
+
+  onderhoudData.forEach((sectie, si) => {
+    sectie.taken.forEach((taak, ti) => {
+      const key = 'o' + si + '_' + ti;
+      const state = onderhoudState[key];
+      const daysSince = state && state.datum ? getDaysSince(state.datum) : null;
+
+      if (daysSince === null) return; // nooit gedaan, geen melding
+
+      const over = daysSince - taak.dagen;
+      if (over > 0) {
+        verlopen.push({ naam: taak.naam, over, datum: state.datum });
+      } else if (over > -3) {
+        // binnen 14 dagen vervalt het
+        bijna.push({ naam: taak.naam, resterend: Math.abs(over), datum: state.datum });
+      }
+    });
+  });
+
+  let html = '';
+
+  if (verlopen.length > 0) {
+    html += `<div class="alert-banner">
+      <div class="alert-banner-header">⚠️ Onderhoud vervallen — actie vereist</div>
+      ${verlopen.map(v => `<div class="alert-item">
+        • ${v.naam}
+        <span class="alert-days">${v.over} dag${v.over !== 1 ? 'en' : ''} te laat</span>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  if (bijna.length > 0) {
+    html += `<div class="alert-banner alert-warning">
+      <div class="alert-banner-header">🔔 Onderhoud binnenkort vervallen</div>
+      ${bijna.map(b => `<div class="alert-item">
+        • ${b.naam}
+        <span class="alert-days">nog ${b.resterend} dag${b.resterend !== 1 ? 'en' : ''}</span>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function getTodayKey() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function getThisWeekKey() {
+  const d = new Date();
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(new Date(d).setDate(diff));
+  return monday.toISOString().split('T')[0];
+}
+
+// ===== RENDER DAGELIJKS =====
+
+function renderDagelijks() {
+  const container = document.getElementById('dagelijksTasks');
+  container.innerHTML = '';
+  let total = 0, done = 0;
+
+  // Remco taken voor vandaag bovenaan
+  const vandaagDag = DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+  const remcoVandaag = [];
+  remcoTakenData.forEach((sectie, si) => {
+    sectie.taken.forEach((taak, ti) => {
+      const key = si + '_' + ti;
+      const state = remcoState[key];
+      if (state && state.selected && state.dagen.includes(vandaagDag)) {
+        remcoVandaag.push({ taak: taak.naam, key: 'remco_' + key });
+      }
+    });
+  });
+
+  if (remcoVandaag.length > 0) {
+    const sKey = 'remco_today';
+    const collapsed = collapsedSections[sKey];
+    let sectieDone = 0;
+    remcoVandaag.forEach(t => { if (dagelijksState[t.key]) sectieDone++; });
+
+    const header = document.createElement('div');
+    header.className = 'section-header' + (collapsed ? ' collapsed' : '');
+    header.style.background = '#1E3A5F';
+    header.innerHTML = `<span class="section-icon">📅</span>Extra taken vandaag (Remco)
+      <span class="section-count-badge">${sectieDone}/${remcoVandaag.length}</span>
+      <span class="section-progress">${Math.round(sectieDone/remcoVandaag.length*100)}%</span>
+      <span class="section-toggle">▼</span>`;
+    header.onclick = () => { collapsedSections[sKey] = !collapsedSections[sKey]; renderDagelijks(); };
+    container.appendChild(header);
+
+    const list = document.createElement('div');
+    list.className = 'task-list' + (collapsed ? ' collapsed' : '');
+
+    remcoVandaag.forEach(t => {
+      const isDone = !!dagelijksState[t.key];
+      if (isDone) done++;
+      total++;
+      const item = document.createElement('div');
+      item.className = 'task-item' + (isDone ? ' done' : '');
+      item.innerHTML = `<div class="task-check">${isDone ? '✓' : ''}</div><div class="task-label">${t.taak}</div>`;
+      item.onclick = () => {
+        dagelijksState[t.key] = !dagelijksState[t.key];
+        localStorage.setItem('dagelijks_' + getTodayKey(), JSON.stringify(dagelijksState));
+        renderDagelijks();
+      };
+      list.appendChild(item);
+    });
+    container.appendChild(list);
+  }
+
+  dagelijksTakenData.forEach((sectie, si) => {
+    const sKey = 'd' + si;
+    const collapsed = collapsedSections[sKey];
+    let sectieDone = 0;
+
+    sectie.taken.forEach((taak, ti) => {
+      const key = si + '_' + ti;
+      if (dagelijksState[key]) { done++; sectieDone++; }
+      total++;
+    });
+
+    const header = document.createElement('div');
+    header.className = 'section-header' + (collapsed ? ' collapsed' : '');
+    header.innerHTML = `<span class="section-icon">${sectie.icon}</span>${sectie.sectie}
+      <span class="section-count-badge">${sectieDone}/${sectie.taken.length}</span>
+      <span class="section-progress">${Math.round(sectieDone/sectie.taken.length*100)}%</span>
+      <span class="section-toggle">▼</span>`;
+    header.onclick = () => { collapsedSections[sKey] = !collapsedSections[sKey]; renderDagelijks(); };
+    container.appendChild(header);
+
+    const list = document.createElement('div');
+    list.className = 'task-list' + (collapsed ? ' collapsed' : '');
+
+    sectie.taken.forEach((taak, ti) => {
+      const key = si + '_' + ti;
+      const isDone = !!dagelijksState[key];
+      const item = document.createElement('div');
+      item.className = 'task-item' + (isDone ? ' done' : '');
+      item.innerHTML = `<div class="task-check">${isDone ? '✓' : ''}</div><div class="task-label">${taak}</div>`;
+      item.onclick = () => {
+        dagelijksState[key] = !dagelijksState[key];
+        localStorage.setItem('dagelijks_' + getTodayKey(), JSON.stringify(dagelijksState));
+        renderDagelijks();
+      };
+      list.appendChild(item);
+    });
+    container.appendChild(list);
+  });
+
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = done + ' / ' + total + ' taken';
+  document.getElementById('submitBtn').disabled = done === 0;
+}
+
+// ===== RENDER SPORTVELDEN =====
+function renderSportvelden() {
+  const container = document.getElementById('sportveldTasks');
+  container.innerHTML = '';
+  let total = 0, done = 0;
+
+  sportveldTakenData.forEach((sectie, si) => {
+    const sKey = 'sv' + si;
+    const collapsed = collapsedSections[sKey];
+    let sectieDone = 0;
+
+    sectie.taken.forEach((taak, ti) => {
+      const key = 'sv' + si + '_' + ti;
+      if (sportveldState[key]) { done++; sectieDone++; }
+      total++;
+    });
+
+    const header = document.createElement('div');
+    header.className = 'section-header' + (collapsed ? ' collapsed' : '');
+    header.innerHTML = `<span class="section-icon">${sectie.icon}</span>${sectie.sectie}
+      <span class="section-count-badge">${sectieDone}/${sectie.taken.length}</span>
+      <span class="section-toggle">▼</span>`;
+    header.onclick = () => { collapsedSections[sKey] = !collapsedSections[sKey]; renderSportvelden(); };
+    container.appendChild(header);
+
+    const list = document.createElement('div');
+    list.className = 'task-list' + (collapsed ? ' collapsed' : '');
+
+    sectie.taken.forEach((taak, ti) => {
+      const key = 'sv' + si + '_' + ti;
+      const isDone = !!sportveldState[key];
+      const item = document.createElement('div');
+      item.className = 'task-item' + (isDone ? ' done' : '');
+      item.innerHTML = `<div class="task-check">${isDone ? '✓' : ''}</div><div class="task-label">${taak}</div>`;
+      item.onclick = () => {
+        sportveldState[key] = !sportveldState[key];
+        localStorage.setItem('sportveld_' + getTodayKey(), JSON.stringify(sportveldState));
+        renderSportvelden();
+      };
+      list.appendChild(item);
+    });
+    container.appendChild(list);
+  });
+
+  document.getElementById('sportveldSubmitBtn').disabled = done === 0;
+}
+
+// ===== RENDER REMCO =====
+function renderRemco() {
+  const container = document.getElementById('remcoTasks');
+  container.innerHTML = '';
+
+  remcoTakenData.forEach((sectie, si) => {
+    const header = document.createElement('div');
+    header.className = 'section-header';
+    header.style.cursor = 'default';
+    header.innerHTML = `<span>${sectie.sectie}</span>`;
+    container.appendChild(header);
+
+    const list = document.createElement('div');
+    list.className = 'task-list';
+
+    sectie.taken.forEach((taak, ti) => {
+      const key = si + '_' + ti;
+      if (!remcoState[key]) remcoState[key] = { selected: false, dagen: [] };
+      const state = remcoState[key];
+
+      const item = document.createElement('div');
+      item.className = 'week-task-item' + (state.selected ? ' selected' : '');
+      item.innerHTML = `
+        <div class="week-task-check" onclick="toggleRemcoTask('${key}')">${state.selected ? '✓' : ''}</div>
+        <div class="week-task-info">
+          <div class="week-task-name">${taak.naam}</div>
+          <div class="week-task-meta">${taak.freq}</div>
+          ${state.selected ? `<div class="day-selector" id="days_${key}">
+            ${DAYS.map(d => `<button class="day-btn${state.dagen.includes(d) ? ' active' : ''}" onclick="toggleDay('${key}','${d}');event.stopPropagation()">${d}</button>`).join('')}
+          </div>` : ''}
+        </div>`;
+      list.appendChild(item);
+    });
+    container.appendChild(list);
+  });
+  updateGeneratedList();
+}
+
+function toggleRemcoTask(key) {
+  if (!remcoState[key]) remcoState[key] = { selected: false, dagen: [] };
+  remcoState[key].selected = !remcoState[key].selected;
+  if (!remcoState[key].selected) remcoState[key].dagen = [];
+  localStorage.setItem('remco_' + getThisWeekKey(), JSON.stringify(remcoState));
+  renderRemco();
+}
+
+function toggleDay(key, dag) {
+  if (!remcoState[key]) return;
+  const idx = remcoState[key].dagen.indexOf(dag);
+  if (idx >= 0) remcoState[key].dagen.splice(idx, 1);
+  else remcoState[key].dagen.push(dag);
+  localStorage.setItem('remco_' + getThisWeekKey(), JSON.stringify(remcoState));
+  updateGeneratedList();
+  const dc = document.getElementById('days_' + key);
+  if (dc) dc.innerHTML = DAYS.map(d =>
+    `<button class="day-btn${remcoState[key].dagen.includes(d) ? ' active' : ''}" onclick="toggleDay('${key}','${d}');event.stopPropagation()">${d}</button>`
+  ).join('');
+}
+
+function updateGeneratedList() {
+  const container = document.getElementById('generatedWeekList');
+  const byDay = {};
+  DAYS.forEach(d => byDay[d] = []);
+
+  remcoTakenData.forEach((sectie, si) => {
+    sectie.taken.forEach((taak, ti) => {
+      const key = si + '_' + ti;
+      const state = remcoState[key];
+      if (state && state.selected && state.dagen.length > 0) {
+        state.dagen.forEach(dag => byDay[dag].push(taak.naam));
+      }
+    });
+  });
+
+  const hasTasks = Object.values(byDay).some(arr => arr.length > 0);
+  if (!hasTasks) {
+    container.innerHTML = '<p style="color:var(--grijs-tekst);font-size:13px;">Selecteer taken hierboven om ze in te plannen.</p>';
+    return;
+  }
+
+  let html = '';
+  DAYS.forEach(dag => {
+    if (byDay[dag].length > 0) {
+      html += `<div class="gen-day-section">
+        <div class="gen-day-header">${dag}</div>
+        ${byDay[dag].map(t => `<div class="gen-task">• ${t}</div>`).join('')}
+      </div>`;
+    }
+  });
+  container.innerHTML = html;
+}
+
+function saveWeekplan() {
+  const byDay = {};
+  DAYS.forEach(d => byDay[d] = []);
+  remcoTakenData.forEach((sectie, si) => {
+    sectie.taken.forEach((taak, ti) => {
+      const key = si + '_' + ti;
+      const state = remcoState[key];
+      if (state && state.selected && state.dagen.length > 0) {
+        state.dagen.forEach(dag => byDay[dag].push(taak.naam));
+      }
+    });
+  });
+  if (!Object.values(byDay).some(arr => arr.length > 0)) { showToast('Selecteer eerst taken!'); return; }
+  saveToHistory({ type: 'weekplan', weekKey: getThisWeekKey(), datum: new Date().toISOString(), door: 'Remco', taken: byDay });
+  showToast('Weekplan opgeslagen! ✓');
+}
+
+// ===== RENDER ONDERHOUD =====
+function renderOnderhoud() {
+  const container = document.getElementById('onderhoudTasks');
+  container.innerHTML = '';
+
+  onderhoudData.forEach((sectie, si) => {
+    const sKey = 'o' + si;
+    const collapsed = collapsedSections[sKey];
+
+    const header = document.createElement('div');
+    header.className = 'section-header' + (collapsed ? ' collapsed' : '');
+    header.innerHTML = `<span class="section-icon">${sectie.icon}</span>${sectie.sectie}<span class="section-toggle">▼</span>`;
+    header.onclick = () => { collapsedSections[sKey] = !collapsedSections[sKey]; renderOnderhoud(); };
+    container.appendChild(header);
+
+    const list = document.createElement('div');
+    list.className = 'task-list' + (collapsed ? ' collapsed' : '');
+
+    sectie.taken.forEach((taak, ti) => {
+      const key = 'o' + si + '_' + ti;
+      const state = onderhoudState[key];
+      const isDone = state && state.done;
+      const lastDate = state && state.datum ? new Date(state.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
+      const item = document.createElement('div');
+      item.className = 'task-item' + (isDone ? ' done' : '');
+      item.innerHTML = `
+        <div class="task-check">${isDone ? '✓' : ''}</div>
+        <div class="task-label">
+          ${taak.naam}
+          ${lastDate ? `<span class="task-sub">Laatste controle: ${lastDate}</span>` : ''}
+        </div>
+        <span class="onderhoud-badge ${taak.badge}">${taak.freq}</span>`;
+      item.onclick = () => {
+        const wasDone = onderhoudState[key] && onderhoudState[key].done;
+        onderhoudState[key] = { done: !wasDone, datum: !wasDone ? new Date().toISOString() : null };
+        if (!wasDone) {
+          saveToHistory({ type: 'onderhoud', datum: new Date().toISOString(), door: 'Remco', taak: taak.naam, freq: taak.freq });
+          showToast(taak.naam + ' afgevinkt ✓');
+        }
+        localStorage.setItem('onderhoud_state', JSON.stringify(onderhoudState));
+        renderAlerts();
+        renderOnderhoud();
+      };
+      list.appendChild(item);
+    });
+    container.appendChild(list);
+  });
+}
+
+// ===== SUBMIT =====
+function submitDagelijks() {
+  const naam = document.getElementById('invullerNaam').value.trim();
+  if (!naam) { showToast('Vul eerst je naam in!'); return; }
+  let total = 0, done = 0;
+  const details = [];
+  dagelijksTakenData.forEach((s, si) => {
+    s.taken.forEach((taak, ti) => {
+      total++;
+      const isDone = !!dagelijksState[si+'_'+ti];
+      if (isDone) done++;
+      details.push({ sectie: s.sectie, taak, gedaan: isDone });
+    });
+  });
+  // Include remco tasks for today
+  const vandaagDag = DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+  remcoTakenData.forEach((sectie, si) => {
+    sectie.taken.forEach((taak, ti) => {
+      const key = si + '_' + ti;
+      const state = remcoState[key];
+      if (state && state.selected && state.dagen.includes(vandaagDag)) {
+        total++;
+        const isDone = !!dagelijksState['remco_' + key];
+        if (isDone) done++;
+        details.push({ sectie: '📅 Extra (Remco)', taak: taak.naam, gedaan: isDone });
+      }
+    });
+  });
+  saveToHistory({ type: 'dagelijks', datum: new Date().toISOString(), door: naam, opmerkingen: document.getElementById('opmerkingen').value.trim(), gedaan: done, totaal: total, details });
+  showToast('Opgeslagen door ' + naam + '! ✓');
+  document.getElementById('invullerNaam').value = '';
+  document.getElementById('opmerkingen').value = '';
+}
+
+function submitSportvelden() {
+  const naam = document.getElementById('sportveldNaam').value.trim();
+  if (!naam) { showToast('Vul eerst je naam in!'); return; }
+  let total = 0, done = 0;
+  const details = [];
+  sportveldTakenData.forEach((s, si) => {
+    s.taken.forEach((taak, ti) => {
+      total++;
+      const isDone = !!sportveldState['sv'+si+'_'+ti];
+      if (isDone) done++;
+      details.push({ sectie: s.sectie, taak, gedaan: isDone });
+    });
+  });
+  saveToHistory({ type: 'sportvelden', datum: new Date().toISOString(), door: naam, opmerkingen: document.getElementById('sportveldOpmerkingen').value.trim(), gedaan: done, totaal: total, details });
+  showToast('Sportvelden opgeslagen door ' + naam + '! ✓');
+  document.getElementById('sportveldNaam').value = '';
+  document.getElementById('sportveldOpmerkingen').value = '';
+}
+
+// ===== HISTORY =====
+function saveToHistory(entry) {
+  const history = JSON.parse(localStorage.getItem('hiltenhal_history') || '[]');
+  history.unshift(entry);
+  localStorage.setItem('hiltenhal_history', JSON.stringify(history.slice(0, 300)));
+  renderHistorie();
+}
+
+function toggleHistoryDetail(id) {
+  const el = document.getElementById('detail_' + id);
+  const arrow = document.getElementById('arrow_' + id);
+  if (el.style.display === 'none') {
+    el.style.display = 'block';
+    arrow.textContent = '▲';
+  } else {
+    el.style.display = 'none';
+    arrow.textContent = '▼';
+  }
+}
+
+function renderHistorie() {
+  const container = document.getElementById('historieList');
+  const history = JSON.parse(localStorage.getItem('hiltenhal_history') || '[]');
+  const filterNaam = (document.getElementById('filterNaam').value || '').toLowerCase();
+  const filterVanaf = document.getElementById('filterVanaf').value;
+  const filterType = document.getElementById('filterType').value;
+
+  const filtered = history.filter(e => {
+    if (filterNaam && !(e.door || '').toLowerCase().includes(filterNaam)) return false;
+    if (filterVanaf && e.datum < filterVanaf) return false;
+    if (filterType && e.type !== filterType) return false;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📋</div>Nog geen opgeslagen lijsten gevonden.</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map((e, idx) => {
+    const d = new Date(e.datum);
+    const dateStr = d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+    const timeStr = d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+
+    if (e.type === 'dagelijks' || e.type === 'sportvelden') {
+      const pct = Math.round(e.gedaan / e.totaal * 100);
+      const icon = e.type === 'sportvelden' ? '🏟️' : '📋';
+
+      // Group details by sectie
+      let detailHtml = '';
+      if (e.details && e.details.length > 0) {
+        const bySectie = {};
+        e.details.forEach(d => {
+          if (!bySectie[d.sectie]) bySectie[d.sectie] = [];
+          bySectie[d.sectie].push(d);
+        });
+        detailHtml = Object.entries(bySectie).map(([sectie, taken]) => `
+          <div style="margin-bottom:10px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--grijs-tekst);margin-bottom:4px;">${sectie}</div>
+            ${taken.map(t => `
+              <div style="display:flex;align-items:center;gap:8px;padding:3px 0;font-size:13px;">
+                <span style="color:${t.gedaan ? 'var(--groen)' : 'var(--rood)'};font-size:12px;">${t.gedaan ? '✓' : '✗'}</span>
+                <span style="color:${t.gedaan ? 'var(--donker)' : 'var(--grijs-tekst)'};${t.gedaan ? '' : 'text-decoration:line-through'}">${t.taak}</span>
+              </div>`).join('')}
+          </div>`).join('');
+      } else {
+        detailHtml = '<p style="font-size:13px;color:var(--grijs-tekst);">Geen taakdetails beschikbaar (oudere opslag)</p>';
+      }
+
+      return `<div class="history-entry">
+        <div class="history-entry-header">
+          <span class="history-date">${dateStr} ${timeStr}</span>
+          <span class="history-name">${icon} ${e.door}</span>
+          <span class="history-score${pct===100?' perfect':''}">${pct}% (${e.gedaan}/${e.totaal})</span>
+          <button onclick="toggleHistoryDetail(${idx})" style="background:none;border:1px solid var(--grijs-mid);border-radius:6px;padding:2px 8px;cursor:pointer;font-size:12px;margin-left:4px;" id="arrow_${idx}">▼</button>
+        </div>
+        <div class="history-tasks" style="margin-bottom:4px;">${e.opmerkingen ? `💬 <span>${e.opmerkingen}</span>` : ''}</div>
+        <div id="detail_${idx}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--grijs-mid);">
+          ${detailHtml}
+        </div>
+      </div>`;
+
+    } else if (e.type === 'weekplan') {
+      const totaalTaken = Object.values(e.taken || {}).flat().length;
+      const detailHtml = Object.entries(e.taken || {})
+        .filter(([dag, taken]) => taken.length > 0)
+        .map(([dag, taken]) => `
+          <div style="margin-bottom:8px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--grijs-tekst);margin-bottom:3px;">${dag}</div>
+            ${taken.map(t => `<div style="font-size:13px;padding:2px 0;">• ${t}</div>`).join('')}
+          </div>`).join('');
+
+      return `<div class="history-entry">
+        <div class="history-entry-header">
+          <span class="history-date">${dateStr}</span>
+          <span class="history-name">📅 Weekplan – ${e.door}</span>
+          <span class="history-score">${totaalTaken} taken</span>
+          <button onclick="toggleHistoryDetail(${idx})" style="background:none;border:1px solid var(--grijs-mid);border-radius:6px;padding:2px 8px;cursor:pointer;font-size:12px;margin-left:4px;" id="arrow_${idx}">▼</button>
+        </div>
+        <div class="history-tasks" style="margin-bottom:4px;">Week van <span>${e.weekKey}</span></div>
+        <div id="detail_${idx}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--grijs-mid);">
+          ${detailHtml}
+        </div>
+      </div>`;
+
+    } else if (e.type === 'onderhoud') {
+      return `<div class="history-entry">
+        <div class="history-entry-header">
+          <span class="history-date">${dateStr} ${timeStr}</span>
+          <span class="history-name">🔧 ${e.door}</span>
+          <span class="history-score" style="color:var(--oranje)">${e.freq}</span>
+        </div>
+        <div class="history-tasks"><span>${e.taak}</span></div>
+      </div>`;
+    }
+    return '';
+  }).join('');
+}
+
+function showTab(tab, el) {
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  el.classList.add('active');
+  if (tab === 'historie') renderHistorie();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+init();
+</script>
+</body>
+</html>
