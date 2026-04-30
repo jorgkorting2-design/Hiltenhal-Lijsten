@@ -420,6 +420,7 @@
   <div class="tab" onclick="showTab('remco', this)">📅 Remco</div>
   <div class="tab" onclick="showTab('sportvelden', this)">🏟️ Sportvelden</div>
   <div class="tab" onclick="showTab('onderhoud', this)">🔧 Onderhoud</div>
+  <div class="tab" onclick="showTab('beheer', this)">⚙️ Beheer</div>
   <div class="tab" onclick="showTab('historie', this)">🕐 Historie</div>
 </div>
 
@@ -492,7 +493,16 @@
   <div id="onderhoudTasks"></div>
 </div>
 
-<!-- TAB 5: HISTORIE -->
+<!-- TAB 5: BEHEER -->
+<div class="content" id="tab-beheer">
+  <div class="remco-intro" style="background:#F3E8FF;border-color:#D8B4FE;color:#6B21A8;">
+    <strong>⚙️ Beheer – Remco</strong>
+    Administratieve taken en periodieke verantwoordelijkheden.
+  </div>
+  <div id="beheerTasks"></div>
+</div>
+
+<!-- TAB 6: HISTORIE -->
 <div class="content" id="tab-historie">
   <div class="history-filter">
     <div class="form-row">
@@ -577,7 +587,9 @@ const dagelijksTakenData = [
     "Entreevloer schoon",
     "Deuren en klinken schoon",
     "Vloermatten schoon",
-    "Desinfectiepomp controleren"
+    "Desinfectiepomp controleren",
+    "Baanschema bekijken",
+    "Kleedkamers nalopen"
   ]},
   { sectie: "Damestoilet (voorzijde)", icon: "🚻", taken: [
     "WC schoon",
@@ -606,10 +618,12 @@ const dagelijksTakenData = [
   { sectie: "Kantine", icon: "🍽️", taken: [
     "Tafels schoon",
     "Stoelen controleren op vlekken/vuil",
+    "Koffiebakjes vullen",
     "Vloer schoon",
     "Prullenbakken leeg"
   ]},
   { sectie: "Biljartruimte", icon: "🎱", taken: [
+    "Tafels schoon",
     "Vloer schoon",
     "Prullenbakken leeg"
   ]},
@@ -654,8 +668,7 @@ const dagelijksTakenData = [
     "Stoelen controleren op vlekken/vuil"
   ]},
   { sectie: "Bar", icon: "🍺", taken: [
-    "Tapinstallatie (3 taps) gespoeld",
-    "Tapinstallatie (4 taps) gespoeld",
+    "Taps schoon",
     "Drip trays leeg en schoon",
     "Barblad schoon",
     "Spoelbak schoon",
@@ -663,6 +676,7 @@ const dagelijksTakenData = [
     "Koelkasten gevuld",
     "Fusten controleren",
     "Kassasysteem schoon",
+    "Pin automaat schoon",
     "IJsemmer schoon",
     "Prullenbak leeg",
     "Koffiemachine schoon",
@@ -670,7 +684,7 @@ const dagelijksTakenData = [
     "Suikerpot/melkkannetje schoon",
     "Barmat schoon",
     "Vloer schoon",
-    "Viltjes vervangen"
+    "Viltjes op de bar leggen 's avonds"
   ]},
   { sectie: "Keuken", icon: "👨‍🍳", taken: [
     "Magnetron schoon",
@@ -754,7 +768,14 @@ const remcoTakenData = [
   { sectie: "Terras & buiten", taken: [
     { naam: "BBQ grondig schoonmaken", freq: "Na evenement / wekelijks" },
     { naam: "Terras vloer vegen", freq: "Wekelijks" },
-    { naam: "Schoonmaakkast opruimen", freq: "Wekelijks" }
+    { naam: "Schoonmaakkast opruimen", freq: "Wekelijks" },
+    { naam: "Buiten water geven", freq: "Wekelijks" }
+  ]},
+  { sectie: "Keuken – extra taken", taken: [
+    { naam: "Vriezer 1 ontdooien", freq: "Wekelijks" },
+    { naam: "Vriezer 2 ontdooien", freq: "Wekelijks" },
+    { naam: "Vriezer 3 ontdooien", freq: "Wekelijks" },
+    { naam: "Lekbak koelcel legen", freq: "Wekelijks" }
   ]},
   { sectie: "Indoor padelbanen – extra taken", taken: [
     { naam: "Pingpongtafel schoonmaken", freq: "Wekelijks" },
@@ -765,29 +786,38 @@ const remcoTakenData = [
 const sportveldTakenData = [
   { sectie: "Indoor tennisbanen (3x)", icon: "🎾", taken: [
     "Banen vegen",
+    "Nethoogte controleren",
+    "Afscheiding controleren",
     "Prullenbakken legen"
   ]},
   { sectie: "Indoor padelbanen (2x)", icon: "🏸", taken: [
     "Banen vegen",
     "Vloer rondom vegen",
+    "Bovenkant padelbaan schoon",
+    "Spelborden controleren",
     "Prullenbakken legen"
   ]},
   { sectie: "Squashbanen (3x)", icon: "🟡", taken: [
     "Baanvloer vegen/dweilen",
-    "Wanden schoonmaken",
-    "Deuren schoonmaken"
+    "Wanden schoon",
+    "Deuren schoon"
   ]},
   { sectie: "Outdoor tennis gravel (2x)", icon: "🌿", taken: [
     "Banen vegen/slepen",
+    "Lijnen vegen",
+    "Egaliseren",
     "Sproei-installatie controleren",
+    "Buitenbanen sproeien",
     "Prullenbakken legen",
-    "Lijnveger schoonmaken na gebruik"
+    "Lijnveger schoon na gebruik"
   ]},
   { sectie: "Outdoor padelbanen (2x)", icon: "🏸", taken: [
     "Banen vegen",
     "Prullenbakken legen"
   ]},
   { sectie: "Beachvolleyveld", icon: "🏐", taken: [
+    "Onkruid verwijderen",
+    "Egaliseren",
     "Prullenbakken legen"
   ]}
 ];
@@ -816,12 +846,13 @@ const onderhoudData = [
   { sectie: "Water & Afvoer", icon: "💧", taken: [
     { naam: "Putten/drainage controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
     { naam: "Afvoersystemen schoonmaken", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
-    { naam: "Vetafscheider schoonmaken", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "Waterverdeler controleren", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
     { naam: "Hoofdwateraansluiting controleren", freq: "Jaarlijks", badge: "badge-jaarlijks", dagen: 365 }
   ]},
   { sectie: "Veiligheid & EHBO", icon: "🏥", taken: [
     { naam: "EHBO-koffers controleren/bijvullen", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
     { naam: "AED controleren", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
+    { naam: "AED accu controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
     { naam: "Beveiligingscamera's controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
     { naam: "Alarmsysteem controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 }
   ]},
@@ -844,9 +875,31 @@ const onderhoudData = [
   ]},
   { sectie: "Bar & Keuken technisch", icon: "🍳", taken: [
     { naam: "Brandblusser keuken controleren", freq: "Halfjaarlijks", badge: "badge-halfjaarlijks", dagen: 180 },
-    { naam: "Koffiemachine ontkalken", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
-    { naam: "Kluis controleren", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 },
-    { naam: "Vriezer ontdooien/grondig schoonmaken", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 }
+    { naam: "Koffiemachine ontkalken", freq: "Maandelijks", badge: "badge-maandelijks", dagen: 30 }
+  ]}
+];
+
+const beheerTakenData = [
+  { sectie: "Financieel", icon: "💰", taken: [
+    { naam: "Wisselgeld controleren", freq: "Dagelijks" },
+  ]},
+  { sectie: "Voorraad", icon: "📦", taken: [
+    { naam: "Tennisballen voorraad controleren", freq: "Wekelijks" },
+    { naam: "Padelballen voorraad controleren", freq: "Wekelijks" },
+  ]},
+  { sectie: "Communicatie & Marketing", icon: "📢", taken: [
+    { naam: "Posters voor evenement maken", freq: "Per evenement" },
+    { naam: "Website updaten", freq: "Per evenement" },
+  ]},
+  { sectie: "Competitie & Leden", icon: "🏆", taken: [
+    { naam: "Competitieteams opgeven", freq: "Seizoensgebonden" },
+    { naam: "Teamcaptains informeren baan indeling", freq: "Seizoensgebonden" },
+    { naam: "Lidmaatschappen KNLTB controleren", freq: "Seizoensgebonden" },
+    { naam: "Tennis lidmaatschappen controleren", freq: "Seizoensgebonden" },
+  ]},
+  { sectie: "Contracten & Facturatie", icon: "📄", taken: [
+    { naam: "Tennis contract banen inventariseren", freq: "Periodiek" },
+    { naam: "Tennis contract banen factureren", freq: "Periodiek" },
   ]}
 ];
 
@@ -854,7 +907,8 @@ const onderhoudData = [
 let dagelijksState = {};
 let sportveldState = {};
 let remcoState = {};
-let onderhoudState = {}; // { key: { done: bool, datum: ISO string } }
+let onderhoudState = {};
+let beheerState = {};
 let collapsedSections = {};
 
 const DAYS = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
@@ -931,23 +985,26 @@ async function init() {
     new Date().toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' });
 
   // Load all state from Firebase
-  const [savedDag, savedSport, savedOnderhoud, savedRemco] = await Promise.all([
+  const [savedDag, savedSport, savedOnderhoud, savedRemco, savedBeheer] = await Promise.all([
     fbGet('dagelijks_' + getTodayKey()),
     fbGet('sportveld_' + getTodayKey()),
     fbGet('onderhoud_state'),
-    fbGet('remco_' + getThisWeekKey())
+    fbGet('remco_' + getThisWeekKey()),
+    fbGet('beheer_state')
   ]);
 
   if (savedDag) dagelijksState = savedDag;
   if (savedSport) sportveldState = savedSport;
   if (savedOnderhoud) onderhoudState = savedOnderhoud;
   if (savedRemco) remcoState = savedRemco;
+  if (savedBeheer) beheerState = savedBeheer;
 
   renderAlerts();
   renderDagelijks();
   renderRemco();
   renderSportvelden();
   renderOnderhoud();
+  renderBeheer();
   renderHistorie();
 }
 
@@ -1425,6 +1482,44 @@ window.renderHistorie = async function renderHistorie() {
     }
     return '';
   }).join('');
+}
+
+// ===== RENDER BEHEER =====
+function renderBeheer() {
+  const container = document.getElementById('beheerTasks');
+  container.innerHTML = '';
+
+  beheerTakenData.forEach((sectie, si) => {
+    const sKey = 'b' + si;
+    const collapsed = collapsedSections[sKey];
+
+    const header = document.createElement('div');
+    header.className = 'section-header' + (collapsed ? ' collapsed' : '');
+    header.innerHTML = `<span class="section-icon">${sectie.icon}</span>${sectie.sectie}<span class="section-toggle">▼</span>`;
+    header.onclick = () => { collapsedSections[sKey] = !collapsedSections[sKey]; renderBeheer(); };
+    container.appendChild(header);
+
+    const list = document.createElement('div');
+    list.className = 'task-list' + (collapsed ? ' collapsed' : '');
+
+    sectie.taken.forEach((taak, ti) => {
+      const key = 'b' + si + '_' + ti;
+      const isDone = !!beheerState[key];
+      const item = document.createElement('div');
+      item.className = 'task-item' + (isDone ? ' done' : '');
+      item.innerHTML = `
+        <div class="task-check">${isDone ? '✓' : ''}</div>
+        <div class="task-label">${taak.naam}</div>
+        <span class="onderhoud-badge badge-maandelijks">${taak.freq}</span>`;
+      item.onclick = () => {
+        beheerState[key] = !beheerState[key];
+        fbSet('beheer_state', beheerState);
+        renderBeheer();
+      };
+      list.appendChild(item);
+    });
+    container.appendChild(list);
+  });
 }
 
 window.showTab = function showTab(tab, el) {
